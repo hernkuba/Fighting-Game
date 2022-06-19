@@ -4,20 +4,29 @@ const c = canvas.getContext('2d');
 canvas.width = 1024;
 canvas.height = 576;
 
-const gravity = 0.3
+const gravity = 0.7
 c.fillRect(0, 0, canvas.width, canvas.height);
 
 class Sprite {
-    constructor({ position, velocity }) {
+    constructor({ position, velocity, color }) {
         this.position = position
         this.velocity = velocity
         this.height = 150
         this.width = 50
+        this.attackBox = {
+            position: this.position,
+            width: 100,
+            height: 50
+        },
+        this.color = color
     }
 
     create() {
-        c.fillStyle = "blue"
+        c.fillStyle = this.color
         c.fillRect(this.position.x, this.position.y, 50, this.height)
+        //attack
+        c.fillStyle = "red"
+        c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height)
     }
 
     refresh() {
@@ -41,7 +50,8 @@ const player = new Sprite({
     velocity: {
         x: 0,
         y: 0
-    }
+    },
+    color: "blue"
 })
 
 
@@ -53,7 +63,8 @@ const player2 = new Sprite({
     velocity: {
         x: 0,
         y: 0
-    }
+    },
+    color: "pink"
 })
 
 const keys = {
@@ -71,10 +82,11 @@ const keys = {
     },
     ArrowRight: {
         pressed: false
+    },
+    ArrowUp: {
+        pressed: false
     }
 }
-
-let lastKey
 
 const animate = () => {
     window.requestAnimationFrame(animate);
@@ -83,19 +95,21 @@ const animate = () => {
     player.refresh()
     player2.refresh()
 
+    //player movement
     player.velocity.x = 0
-    if (keys.a.pressed && lastKey === "a") {
-        player.velocity.x = -3
-    } else if (keys.d.pressed && lastKey === "d") {
-        player.velocity.x = 3
+    if (keys.a.pressed && player.lastKey === "a") {
+        player.velocity.x = -5
+    } else if (keys.d.pressed && player.lastKey === "d") {
+        player.velocity.x = 5
+    }
+    //player2 movement
+    player2.velocity.x = 0
+    if (keys.ArrowLeft.pressed && player2.lastKey === "ArrowLeft") {
+        player2.velocity.x = -5
+    } else if (keys.ArrowRight.pressed && player2.lastKey === "ArrowRight") {
+        player2.velocity.x = 5
     }
 
-    player2.velocity.x = 0
-    if (keys.ArrowLeft.pressed && lastKey === "ArrowLeft") {
-        player2.velocity.x = -3
-    } else if (keys.ArrowRight.pressed && lastKey === "ArrowRight") {
-        player2.velocity.x = 3
-    }
 };
 
 animate();
@@ -104,22 +118,25 @@ window.addEventListener("keydown", (event) => {
     switch (event.key) {
         case "d":
             keys.d.pressed = true
-            lastKey = "d"
+            player.lastKey = "d"
             break;
         case "a":
             keys.a.pressed = true
-            lastKey = "a"
+            player.lastKey = "a"
+            break;
+        case "w":
+            player.velocity.y = -20
             break;
         case "ArrowLeft":
             keys.ArrowLeft.pressed = true
-            lastKey = "ArrowLeft"
+            player2.lastKey = "ArrowLeft"
             break;
         case "ArrowRight":
             keys.ArrowRight.pressed = true
-            lastKey = "ArrowRight"
+            player2.lastKey = "ArrowRight"
             break;
-        case "w":
-            player.velocity.y = -10
+        case "ArrowUp":
+            player2.velocity.y = -20
             break;
     }
     console.log(event.key);
@@ -141,6 +158,9 @@ window.addEventListener("keyup", (event) => {
             break;
         case "ArrowRight":
             keys.ArrowRight.pressed = false
+            break;
+        case "ArrowUp":
+            keys.ArrowUp.pressed = false
             break;
     }
     console.log(event.key);
