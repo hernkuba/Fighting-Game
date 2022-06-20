@@ -17,16 +17,19 @@ class Sprite {
             position: this.position,
             width: 100,
             height: 50
-        },
+        }
         this.color = color
+        this.isAttacking
     }
 
     create() {
         c.fillStyle = this.color
-        c.fillRect(this.position.x, this.position.y, 50, this.height)
+        c.fillRect(this.position.x, this.position.y, this.width, this.height)
         //attack
+        if (this.isAttacking) {
         c.fillStyle = "red"
         c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height)
+    }
     }
 
     refresh() {
@@ -39,6 +42,12 @@ class Sprite {
         } else {
             this.velocity.y += gravity
         }
+    }
+    attack() {
+        this.isAttacking = true
+        setTimeout(() => {
+            this.isAttacking = false
+        }, 100)
     }
 }
 
@@ -110,6 +119,12 @@ const animate = () => {
         player2.velocity.x = 5
     }
 
+    // detect colsion
+    if (player.attackBox.position.x + player.attackBox.width >= player2.position.x && player.attackBox.position.x <= player2.position.x + player2.width && player.attackBox.position.y - 50 >= player2.position.y - player2.height &&
+        player.isAttacking) {
+        console.log("hit");
+    }
+
 };
 
 animate();
@@ -126,6 +141,9 @@ window.addEventListener("keydown", (event) => {
             break;
         case "w":
             player.velocity.y = -20
+            break;
+        case " ":
+            player.attack()
             break;
         case "ArrowLeft":
             keys.ArrowLeft.pressed = true
